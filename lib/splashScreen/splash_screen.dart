@@ -43,7 +43,11 @@ class _SplashScreenState extends State<SplashScreen> {
               const SizedBox(height: 10,),
               Padding(
                 padding:const EdgeInsets.all(10.0),
-                child: ReusableText(text: "Sell Food Online",size: 40,fontFamily: "Signatra",color: black54,textAlign: TextAlign.center,letterSpacing: 3,)
+                child: ReusableText(text: "Sell Food Online",size: 40,fontFamily: "Signatra",color: black54,textAlign: TextAlign.center,letterSpacing: 3,),
+
+              ),
+             const CircularProgressIndicator(
+                color: progressColor
               )
             ],
           ),

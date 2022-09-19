@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:my_podpanda_app/auth/login_screen.dart';
+import 'package:my_podpanda_app/auth/signup_screen.dart';
 import 'package:my_podpanda_app/consts/app_colors.dart';
 import 'package:my_podpanda_app/widgets/reusable_text.dart';
 
@@ -33,7 +35,7 @@ class _AuthScreenState extends State<AuthScreen> {
               fontFamily: "Lobster",
             ),
             centerTitle: true,
-            bottom: TabBar(
+            bottom:const TabBar(
               indicatorColor: indicatorColor ,
               indicatorWeight: 6,
               tabs: [
@@ -61,8 +63,14 @@ class _AuthScreenState extends State<AuthScreen> {
               gradient: LinearGradient(
                 colors: [amberAccent.withOpacity(0.8),pinkAccent.withOpacity(0.8)],
                 begin: Alignment.topRight,
-                end: Alignment.bottomLeft
+                end: Alignment.bottomLeft,
               )
+            ),
+            child:const TabBarView(
+              children: [
+                LoginScreen(),
+                SignUpScreen()
+              ],
             ),
           ),
         ));
