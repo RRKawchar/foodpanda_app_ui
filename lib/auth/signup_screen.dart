@@ -17,8 +17,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final GlobalKey<FormState> _formKey=GlobalKey<FormState>();
 
-  XFile? imageXFile;
-  final ImagePicker _imagePicker=ImagePicker();
 
   TextEditingController nameController=TextEditingController();
   TextEditingController emailController=TextEditingController();
@@ -26,6 +24,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController confirmPasswordController=TextEditingController();
   TextEditingController phoneController=TextEditingController();
   TextEditingController locationController=TextEditingController();
+
+  XFile? imageXFile;
+  final ImagePicker _imagePicker=ImagePicker();
+
+
+  Future<void> _getImage()async{
+
+
+   imageXFile=await _imagePicker.pickImage(source: ImageSource.gallery);
+   setState(() {
+
+     imageXFile;
+   });
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +49,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           children: [
             const SizedBox(height: 10,),
             InkWell(
+              onTap: (){
+                _getImage();
+              },
               child: CircleAvatar(
                 radius: MediaQuery.of(context).size.width*0.20,
                 backgroundColor:whiteColor,
