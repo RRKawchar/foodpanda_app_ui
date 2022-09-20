@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_podpanda_app/consts/app_colors.dart';
 import 'package:my_podpanda_app/widgets/custom_textField.dart';
@@ -29,6 +31,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final ImagePicker _imagePicker=ImagePicker();
 
 
+  Position? position;
+  List<Placemark>? placemarks;
+
   Future<void> _getImage()async{
 
 
@@ -38,6 +43,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
      imageXFile;
    });
 
+  }
+
+  getCurrentLocation()async{
+    Position newPosition=await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    // ignore: unrelated_type_equality_checks
+    position=newPosition;
+     placemarks=await placemarkFromCoordinates(
+
+       position!.latitude,
+       position!.longitude
+     );
+     Placemark pMark=placemarks![0];
+     String completeAddress='${pMark.subAdministrativeArea},${pMark.thoroughfare},'
+         '${pMark.subLocality},${pMark.locality},${pMark.subAdministrativeArea},${pMark.administrativeArea},${pMark.postalCode},${pMark.country}';
+     locationController.text=completeAddress;
   }
 
   @override
@@ -113,6 +135,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       alignment: Alignment.center,
                       child: ElevatedButton.icon(
                           onPressed: (){
+                            getCurrentLocation();
                             print("clicked");
 
                           },
