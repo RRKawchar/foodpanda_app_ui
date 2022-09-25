@@ -1,12 +1,18 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_podpanda_app/consts/app_colors.dart';
+import 'package:my_podpanda_app/main_screen/home_screen.dart';
 import 'package:my_podpanda_app/widgets/custom_textField.dart';
+import 'package:my_podpanda_app/widgets/error_dialog.dart';
+import 'package:my_podpanda_app/widgets/loading_dialog.dart';
 import 'package:my_podpanda_app/widgets/reusable_text.dart';
+import 'package:firebase_storage/firebase_storage.dart' as fStorage;
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -29,6 +35,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   XFile? imageXFile;
   final ImagePicker _imagePicker=ImagePicker();
+
+  String completeAddress="";
+  String sellerImageUrl="";
 
 
   Position? position;
@@ -57,11 +66,119 @@ class _SignUpScreenState extends State<SignUpScreen> {
        position!.longitude
      );
      Placemark pMark=placemarks![0];
-     String completeAddress='${pMark.subAdministrativeArea},${pMark.thoroughfare},'
+
+     completeAddress='${pMark.subAdministrativeArea},${pMark.thoroughfare},'
+
          '${pMark.subLocality},${pMark.locality},${pMark.subAdministrativeArea},${pMark.administrativeArea},${pMark.postalCode},${pMark.country}';
      locationController.text=completeAddress;
   }
 
+  Future<void> formValidation()async{
+
+    if(imageXFile==null){
+
+      showDialog(
+          context: context,
+          builder: (c){
+            return ErrorDialog(
+              message: "Please select an image.",
+            );
+          }
+      );
+    }else{
+
+      if(passwordController.text==confirmPasswordController.text){
+        ///
+         if(nameController.text.isNotEmpty && emailController.text.isNotEmpty &&
+             passwordController.text.isNotEmpty &&
+             confirmPasswordController.text.isNotEmpty && phoneController.text.isNotEmpty && locationController.text.isNotEmpty){
+            ///start uploading
+
+            showDialog(
+                context: context,
+                builder: (c){
+                  return LoadingDialog(
+                    message: "Registering Account",
+                  );
+                }
+            );
+
+            String fileName=DateTime.now().millisecondsSinceEpoch.toString();
+            fStorage.Reference reference=fStorage.FirebaseStorage.instance.ref().child("sellers").child(fileName);
+            fStorage.UploadTask uploadTask=reference.putFile(File(imageXFile!.path));
+            fStorage.TaskSnapshot taskSnapshot=await uploadTask.whenComplete((){});
+            await taskSnapshot.ref.getDownloadURL().then((url) {
+              sellerImageUrl=url;
+            });
+
+            authenticateSellerAndSignUp();
+
+
+         }else{
+           showDialog(
+               context: context,
+               builder: (c){
+                 return ErrorDialog(
+                   message: "Please write the complete required info for sign up !",
+                 );
+               }
+           );
+
+         }
+
+      }else{
+        showDialog(
+            context: context,
+            builder: (c){
+              return ErrorDialog(
+                message: "Password do not match",
+              );
+            }
+        );
+      }
+    }
+  }
+
+  void authenticateSellerAndSignUp()async{
+
+    User?currentUser;
+    final FirebaseAuth firebaseAuth=FirebaseAuth.instance;
+
+    await firebaseAuth.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim()
+    ).then((auth){
+
+    currentUser=auth.user;
+    });
+
+    if(currentUser!=null){
+      saveDataToFirestore(currentUser!).then((value){
+      Navigator.pop(context);
+
+      Route newRoute=MaterialPageRoute(builder: (c)=>HomeScreen());
+      Navigator.pushReplacement(context, newRoute);
+      });
+    }
+
+  }
+
+   Future saveDataToFirestore(User currentUser)async{
+  FirebaseFirestore.instance.collection("sellers").doc(currentUser.uid).set({
+    'sellersUID':currentUser.uid,
+    'sellersEmail':currentUser.email,
+    'sellerName':nameController.text.trim(),
+    'sellersAvatarUrl':sellerImageUrl,
+    'phone':phoneController.text.trim(),
+    'address':completeAddress,
+    'status':"approved",
+    'earnings':0.0,
+    'lat':position!.latitude,
+    'lng':position!.longitude
+
+  });
+
+   }
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -135,8 +252,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       alignment: Alignment.center,
                       child: ElevatedButton.icon(
                           onPressed: (){
+                            // _determinePosition();
                             getCurrentLocation();
-                            print("clicked");
+                            // print("clicked");
 
                           },
                           icon:const Icon(Icons.location_on,color: whiteColor),
@@ -154,6 +272,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                         onPressed: (){
                           print("Clicked");
+                          formValidation();
                         },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: cyanColor,

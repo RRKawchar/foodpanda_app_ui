@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "675531088988",
+    "project_id": "podpanda-web-responsive",
+    "storage_bucket": "podpanda-web-responsive.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675531088988:android:8e62bf80df36a71403f299",
+        "android_client_info": {
+          "package_name": "com.example.my_podpanda_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "675531088988-8et810oune7cjuiciuuq9d7040l3qt4g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.my_podpanda_app",
+            "certificate_hash": "954543f7ad960a4fec5d367a26ca422abd0039ae"
+          }
+        },
+        {
+          "client_id": "675531088988-m0j92160kjirhlr1iomp1jee2o9em7pg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCq7B4Y61Cl7SIfaEihwNKWr3aLkutdZBg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "675531088988-m0j92160kjirhlr1iomp1jee2o9em7pg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

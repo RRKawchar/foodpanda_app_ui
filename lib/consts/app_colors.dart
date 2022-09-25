@@ -8,4 +8,5 @@ const amberColor=Colors.amber;
 const purpleColor=Colors.purple;
 const indicatorColor=Colors.white38;
 const cyanColor=Colors.cyan;
+const redColor=Colors.red;
 const progressColor=Colors.cyan;
