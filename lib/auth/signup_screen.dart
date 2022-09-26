@@ -7,12 +7,14 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_podpanda_app/consts/app_colors.dart';
+import 'package:my_podpanda_app/global/global.dart';
 import 'package:my_podpanda_app/main_screen/home_screen.dart';
 import 'package:my_podpanda_app/widgets/custom_textField.dart';
 import 'package:my_podpanda_app/widgets/error_dialog.dart';
 import 'package:my_podpanda_app/widgets/loading_dialog.dart';
 import 'package:my_podpanda_app/widgets/reusable_text.dart';
 import 'package:firebase_storage/firebase_storage.dart' as fStorage;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -53,24 +55,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
    });
 
   }
-
   getCurrentLocation()async{
     Position newPosition=await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
     // ignore: unrelated_type_equality_checks
     position=newPosition;
-     placemarks=await placemarkFromCoordinates(
+    placemarks=await placemarkFromCoordinates(
 
-       position!.latitude,
-       position!.longitude
-     );
-     Placemark pMark=placemarks![0];
+        position!.latitude,
+        position!.longitude
+    );
+    Placemark pMark=placemarks![0];
 
-     completeAddress='${pMark.subAdministrativeArea},${pMark.thoroughfare},'
+    completeAddress='${pMark.subAdministrativeArea},${pMark.thoroughfare},'
 
-         '${pMark.subLocality},${pMark.locality},${pMark.subAdministrativeArea},${pMark.administrativeArea},${pMark.postalCode},${pMark.country}';
-     locationController.text=completeAddress;
+        '${pMark.subLocality},${pMark.locality},${pMark.subAdministrativeArea},${pMark.administrativeArea},${pMark.postalCode},${pMark.country}';
+    locationController.text=completeAddress;
+
   }
 
   Future<void> formValidation()async{
@@ -142,7 +144,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void authenticateSellerAndSignUp()async{
 
     User?currentUser;
-    final FirebaseAuth firebaseAuth=FirebaseAuth.instance;
 
     await firebaseAuth.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
@@ -150,13 +151,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     ).then((auth){
 
     currentUser=auth.user;
+    }).catchError((error){
+      Navigator.pop(context);
+      showDialog(
+          context: context,
+          builder: (c){
+            return ErrorDialog(
+              message: error.message.toString(),
+            );
+          }
+      );
     });
 
     if(currentUser!=null){
       saveDataToFirestore(currentUser!).then((value){
+
       Navigator.pop(context);
 
-      Route newRoute=MaterialPageRoute(builder: (c)=>HomeScreen());
+      Route newRoute=MaterialPageRoute(builder: (value)=>HomeScreen());
       Navigator.pushReplacement(context, newRoute);
       });
     }
@@ -177,6 +189,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     'lng':position!.longitude
 
   });
+  
+  sharedPreferences=await SharedPreferences.getInstance();
+  
+  await sharedPreferences!.setString('uid', currentUser.uid);
+  await sharedPreferences!.setString('email', currentUser.email.toString());
+  await sharedPreferences!.setString('name', nameController.text.trim());
+  await sharedPreferences!.setString('photoUrl', sellerImageUrl);
+
+  
 
    }
   @override

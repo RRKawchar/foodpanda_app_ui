@@ -1,8 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:my_podpanda_app/auth/auth_screen.dart';
 import 'package:my_podpanda_app/consts/app_colors.dart';
+import 'package:my_podpanda_app/global/global.dart';
+import 'package:my_podpanda_app/main_screen/home_screen.dart';
 import 'package:my_podpanda_app/utils/app_images.dart';
 import 'package:my_podpanda_app/widgets/reusable_text.dart';
 
@@ -17,9 +18,16 @@ class _SplashScreenState extends State<SplashScreen> {
 
 
   startTimer(){
-    Timer(const Duration(seconds: 5), ()async {
+    Timer(const Duration(seconds: 3), ()async {
 
-      Navigator.push(context, MaterialPageRoute(builder: (_)=>const AuthScreen()));
+      if(firebaseAuth.currentUser!=null){
+
+        Navigator.push(context, MaterialPageRoute(builder: (_)=>const HomeScreen()));
+
+      }else{
+        Navigator.push(context, MaterialPageRoute(builder: (_)=>const AuthScreen()));
+      }
+
 
     });
   }
