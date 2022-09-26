@@ -16,12 +16,12 @@ class ErrorDialog extends StatelessWidget {
           onPressed: (){
            Navigator.pop(context);
           },
-          child: const Center(
-           child: Text("OK"),
-          ),
        style: ElevatedButton.styleFrom(
         backgroundColor: redColor
        ),
+          child:const Center(
+           child: Text("OK"),
+          ),
       )
      ],
     );
